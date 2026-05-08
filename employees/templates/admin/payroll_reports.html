@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Payroll Reports{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Payroll Reports & Analytics</h2>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Payroll</h5>
+                    <h3>₹{{ summary.total_amount|floatformat:2 }}</h3>
+                    <small>{{ summary.month }}/{{ summary.year }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Employees Paid</h5>
+                    <h3>{{ summary.employee_count }}</h3>
+                    <small>This month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Avg Salary</h5>
+                    <h3>₹{{ summary.avg_salary|floatformat:2 }}</h3>
+                    <small>Per employee</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Bonuses Paid</h5>
+                    <h3>₹{{ summary.total_bonuses|floatformat:2 }}</h3>
+                    <small>This month</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-2">
+                    <label>Month</label>
+                    <select name="month" class="form-control">
+                        {% for m in "123456789012" %}
+                        <option value="{{ forloop.counter }}" {% if forloop.counter == month %}selected{% endif %}>
+                            {{ forloop.counter|date:"F" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>Year</label>
+                    <input type="number" name="year" class="form-control" value="{{ year }}">
+                </div>
+                <div class="col-md-2">
+                    <label>Department</label>
+                    <select name="department" class="form-control">
+                        <option value="">All</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary d-block">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <label>&nbsp;</label>
+                    <a href="{% url 'payroll_export_csv' %}?month={{ month }}&year={{ year }}" class="btn btn-success d-block">
+                        Export CSV
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Department Breakdown -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Department-wise Payroll</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Employees</th>
+                        <th>Total Payroll</th>
+                        <th>Avg Salary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in dept_breakdown %}
+                    <tr>
+                        <td>{{ dept.name }}</td>
+                        <td>{{ dept.employee_count }}</td>
+                        <td>₹{{ dept.total_payroll|floatformat:2 }}</td>
+                        <td>₹{{ dept.avg_salary|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">No data available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Recent Batches -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Recent Payroll Batches</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Batch ID</th>
+                        <th>Month/Year</th>
+                        <th>Status</th>
+                        <th>Employees</th>
+                        <th>Total Amount</th>
+                        <th>Success/Failed</th>
+                        <th>Created By</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for batch in batches %}
+                    <tr>
+                        <td><code>{{ batch.batch_id }}</code></td>
+                        <td>{{ batch.month }}/{{ batch.year }}</td>
+                        <td>
+                            <span class="badge bg-{% if batch.status == 'completed' %}success{% elif batch.status == 'failed' %}danger{% else %}warning{% endif %}">
+                                {{ batch.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ batch.employee_count }}</td>
+                        <td>₹{{ batch.total_amount|floatformat:2 }}</td>
+                        <td>
+                            <span class="text-success">{{ batch.successful_count }}</span> / 
+                            <span class="text-danger">{{ batch.failed_count }}</span>
+                        </td>
+                        <td>{{ batch.created_by.username }}</td>
+                        <td>{{ batch.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center">No batches found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

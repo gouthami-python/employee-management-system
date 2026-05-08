@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Status - Employee Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-alt"></i> My Leave Requests</h2>
+    <a href="{% url 'employee_leave_apply' %}" class="btn btn-primary">Apply for Leave</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if leaves %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Leave Type</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Applied On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in leaves %}
+                        <tr>
+                            <td>{{ leave.get_leave_type_display }}</td>
+                            <td>{{ leave.start_date }}</td>
+                            <td>{{ leave.end_date }}</td>
+                            <td>
+                                <span class="badge bg-{% if leave.status == 'approved' %}success{% elif leave.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                    {{ leave.get_status_display }}
+                                </span>
+                                {% if leave.reviewed_at %}
+                                <br><small class="text-muted">Reviewed: {{ leave.reviewed_at|date:"M d, Y" }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ leave.applied_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% if leave.admin_remarks %}
+                        <tr>
+                            <td colspan="5" class="bg-light">
+                                <strong>Admin Remarks:</strong> {{ leave.admin_remarks }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted text-center">No leave requests found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

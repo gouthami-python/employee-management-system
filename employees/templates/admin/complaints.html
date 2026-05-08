@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaints - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-exclamation-circle"></i> Complaints</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if complaints %}
+            {% for complaint in complaints %}
+            <div class="border-bottom pb-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6>{{ complaint.subject }}</h6>
+                        <p class="text-muted mb-2">{{ complaint.description|truncatechars:150 }}</p>
+                        <small class="text-muted">
+                            By: {% if not complaint.is_anonymous %}{{ complaint.employee }}{% else %}Anonymous{% endif %} | 
+                            {{ complaint.created_at|date:"M d, Y" }}
+                        </small>
+                        {% if complaint.admin_response %}
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <strong>Response:</strong> {{ complaint.admin_response }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-{% if complaint.status == 'resolved' %}success{% elif complaint.status == 'in_progress' %}primary{% else %}danger{% endif %} mb-2">
+                            {{ complaint.get_status_display }}
+                        </span>
+                        <br>
+                        <a href="{% url 'complaint_respond' complaint.pk %}" class="btn btn-sm btn-outline-primary">Respond</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted text-center">No complaints found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

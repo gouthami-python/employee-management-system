@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Salary Management - Admin Panel{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-money-bill-wave"></i> Salary Management</h2>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Position</th>
+                        <th>Salary</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr>
+                        <td>{{ emp.employee_id }}</td>
+                        <td>{{ emp.user.get_full_name|default:emp.user.username }}</td>
+                        <td>{{ emp.department|default:"N/A" }}</td>
+                        <td>{{ emp.position|default:"N/A" }}</td>
+                        <td>₹{{ emp.salary|floatformat:2 }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="updateSalary({{ emp.pk }}, '{{ emp.user.get_full_name|default:emp.user.username }}')">Edit</button>
+                            <a href="{% url 'admin_salary_history' emp.pk %}" class="btn btn-sm btn-info">History</a>
+                            <a href="{% url 'admin_bonus_add' emp.pk %}" class="btn btn-sm btn-success">Bonus</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

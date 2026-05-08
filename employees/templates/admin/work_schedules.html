@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Work Schedules{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title">
+                        <i class="fas fa-calendar-alt me-2"></i>Work Schedules ({{ total_schedules }} total)
+                    </h4>
+                    <div>
+                        <a href="{% url 'admin_schedule_add' %}" class="btn btn-success me-2">
+                            <i class="fas fa-plus me-2"></i>Add Schedule
+                        </a>
+                        <a href="{% url 'admin_attendance_dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Day</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Working Day</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ schedule.employee.user.get_full_name }}</strong><br>
+                                        <small class="text-muted">{{ schedule.employee.employee_id }}</small>
+                                    </td>
+                                    <td>{{ schedule.get_day_of_week_display }}</td>
+                                    <td>{{ schedule.start_time|time:"H:i" }}</td>
+                                    <td>{{ schedule.end_time|time:"H:i" }}</td>
+                                    <td>
+                                        {% if schedule.is_working_day %}
+                                            <span class="badge bg-success">Yes</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No work schedules found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

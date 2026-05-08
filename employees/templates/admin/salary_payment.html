@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Monthly Salary Payment{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-money-check-alt"></i> Monthly Salary Payment</h2>
+    <a href="{% url 'admin_payment_history' %}" class="btn btn-info">Payment History</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Month</label>
+                    <select name="month" class="form-select" required>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Year</label>
+                    <input type="number" name="year" class="form-control" value="2024" required>
+                </div>
+            </div>
+
+            <h5>Select Employees</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Salary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in employees %}
+                        <tr>
+                            <td><input type="checkbox" name="employees" value="{{ emp.pk }}" class="emp-checkbox"></td>
+                            <td>{{ emp.employee_id }}</td>
+                            <td>{{ emp.user.get_full_name }}</td>
+                            <td>{{ emp.department|default:"N/A" }}</td>
+                            <td>?{{ emp.salary|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg mt-3">
+                <i class="fas fa-paper-plane"></i> Send Salary Payment
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.emp-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee List - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users"></i> Employee List</h2>
+    <a href="{% url 'employee_add' %}" class="btn btn-primary">Add Employee</a>
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Search by name, username, or ID" value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="department" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="position" class="form-control" placeholder="Filter by position" value="{{ selected_position }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if employees %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr>
+                            <td>{{ employee.employee_id }}</td>
+                            <td>{{ employee.user.get_full_name|default:employee.user.username }}</td>
+                            <td>{{ employee.department|default:"Not assigned" }}</td>
+                            <td>{{ employee.position|default:"Not specified" }}</td>
+                            <td>
+                                <a href="{% url 'employee_edit' employee.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-sm btn-outline-danger delete-btn">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted text-center">No employees found. Try adjusting your search filters.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

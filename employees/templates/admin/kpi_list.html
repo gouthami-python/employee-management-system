@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}KPI Management - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-bar"></i> Key Performance Indicators (KPIs)</h2>
+    <div>
+        <a href="{% url 'kpi_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add KPI
+        </a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+{% if kpis %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">All KPIs ({{ kpis.count }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>KPI Name</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Target Value</th>
+                        <th>Unit</th>
+                        <th>Weight</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for kpi in kpis %}
+                    <tr>
+                        <td>
+                            <strong>{{ kpi.name }}</strong><br>
+                            <small class="text-muted">{{ kpi.description|truncatechars:50 }}</small>
+                        </td>
+                        <td>
+                            {% if kpi.department %}
+                                <span class="badge bg-info">{{ kpi.department.name }}</span>
+                            {% else %}
+                                <span class="text-muted">All Departments</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if kpi.role %}
+                                <span class="badge bg-secondary">{{ kpi.role.title }}</span>
+                            {% else %}
+                                <span class="text-muted">All Roles</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ kpi.target_value }}</strong>
+                        </td>
+                        <td>{{ kpi.unit }}</td>
+                        <td>{{ kpi.weight }}</td>
+                        <td>
+                            {% if kpi.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ kpi.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#kpiModal{{ kpi.pk }}" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a href="{% url 'employee_kpi_add' %}" class="btn btn-sm btn-outline-success" title="Assign to Employee">
+                                    <i class="fas fa-user-plus"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Detail Modals -->
+{% for kpi in kpis %}
+<div class="modal fade" id="kpiModal{{ kpi.pk }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">KPI Details - {{ kpi.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Basic Information</h6>
+                        <p><strong>Name:</strong> {{ kpi.name }}</p>
+                        <p><strong>Description:</strong> {{ kpi.description }}</p>
+                        <p><strong>Target Value:</strong> {{ kpi.target_value }} {{ kpi.unit }}</p>
+                        <p><strong>Weight:</strong> {{ kpi.weight }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Scope</h6>
+                        <p><strong>Department:</strong> 
+                            {% if kpi.department %}
+                                {{ kpi.department.name }}
+                            {% else %}
+                                All Departments
+                            {% endif %}
+                        </p>
+                        <p><strong>Role:</strong> 
+                            {% if kpi.role %}
+                                {{ kpi.role.title }}
+                            {% else %}
+                                All Roles
+                            {% endif %}
+                        </p>
+                        <p><strong>Status:</strong> 
+                            {% if kpi.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Created:</strong> {{ kpi.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>Assigned Employees</h6>
+                {% with kpi.employeekpi_set.all as assigned_employees %}
+                    {% if assigned_employees %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Target</th>
+                                        <th>Current</th>
+                                        <th>Achievement</th>
+                                        <th>Period</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for emp_kpi in assigned_employees %}
+                                    <tr>
+                                        <td>{{ emp_kpi.employee.user.get_full_name }}</td>
+                                        <td>{{ emp_kpi.target_value }}</td>
+                                        <td>{{ emp_kpi.current_value }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 15px;">
+                                                <div class="progress-bar bg-{% if emp_kpi.achievement_percentage >= 80 %}success{% elif emp_kpi.achievement_percentage >= 60 %}primary{% elif emp_kpi.achievement_percentage >= 40 %}warning{% else %}danger{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ emp_kpi.achievement_percentage }}%">
+                                                    {{ emp_kpi.achievement_percentage|floatformat:0 }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ emp_kpi.period_start|date:"M d" }} - {{ emp_kpi.period_end|date:"M d" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No employees assigned to this KPI yet.</p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{% url 'employee_kpi_add' %}" class="btn btn-primary">Assign to Employee</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="card">
+    <div class="card-body text-center">
+        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+        <h5>No KPIs Found</h5>
+        <p class="text-muted">Start by creating your first Key Performance Indicator.</p>
+        <a href="{% url 'kpi_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add First KPI
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

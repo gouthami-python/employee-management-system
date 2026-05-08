@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+            <p class="text-muted">Welcome to the Employee Management System</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_employees }}</h4>
+                            <p class="mb-0">Total Employees</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_departments }}</h4>
+                            <p class="mb-0">Departments</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-building fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ active_tasks }}</h4>
+                            <p class="mb-0">Active Tasks</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-tasks fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ pending_leaves }}</h4>
+                            <p class="mb-0">Pending Leaves</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_reviews }}</h4>
+                            <p class="mb-0">Performance Reviews</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_goals }}</h4>
+                            <p class="mb-0">Performance Goals</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bullseye fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ open_complaints }}</h4>
+                            <p class="mb-0">Open Complaints</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exclamation-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card" style="background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ avg_performance_rating }}</h4>
+                            <p class="mb-0">Avg Performance</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        {% if performance_chart %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Department Performance</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="data:image/png;base64,{{ performance_chart }}" class="img-fluid" alt="Performance Chart">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if task_status_chart %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Task Status Distribution</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="data:image/png;base64,{{ task_status_chart }}" class="img-fluid" alt="Task Status Chart">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tasks"></i> Recent Tasks</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_tasks %}
+                        {% for task in recent_tasks %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                            <div>
+                                <strong>{{ task.title|truncatechars:30 }}</strong><br>
+                                <small class="text-muted">{{ task.assigned_to }}</small>
+                            </div>
+                            <span class="badge badge-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent tasks</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-calendar"></i> Pending Leaves</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_leaves %}
+                        {% for leave in recent_leaves %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                            <div>
+                                <strong>{{ leave.employee }}</strong><br>
+                                <small class="text-muted">{{ leave.start_date }} - {{ leave.end_date }}</small>
+                            </div>
+                            <span class="badge badge-warning">{{ leave.get_status_display }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No pending leaves</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-exclamation-circle"></i> Recent Complaints</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_complaints %}
+                        {% for complaint in recent_complaints %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                            <div>
+                                <strong>{{ complaint.subject|truncatechars:25 }}</strong><br>
+                                <small class="text-muted">{{ complaint.employee }}</small>
+                            </div>
+                            <span class="badge badge-{% if complaint.status == 'resolved' %}success{% elif complaint.status == 'in_progress' %}warning{% else %}danger{% endif %}">
+                                {{ complaint.get_status_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent complaints</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Complaints - Employee Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-exclamation-circle"></i> My Complaints</h2>
+    <a href="{% url 'employee_complaint_submit' %}" class="btn btn-warning">Submit New Complaint</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if complaints %}
+            {% for complaint in complaints %}
+            <div class="border-bottom pb-3 mb-3">
+                <div class="d-flex justify-content-between">
+                    <h6>{{ complaint.subject }}</h6>
+                    <span class="badge bg-{% if complaint.status == 'resolved' %}success{% elif complaint.status == 'in_progress' %}primary{% else %}danger{% endif %}">
+                        {{ complaint.get_status_display }}
+                    </span>
+                </div>
+                <p class="text-muted">{{ complaint.description|truncatechars:100 }}</p>
+                <small class="text-muted">Submitted: {{ complaint.created_at|date:"M d, Y" }}</small>
+                {% if complaint.admin_response %}
+                <div class="mt-2 p-2 bg-light rounded">
+                    <strong>Admin Response:</strong> {{ complaint.admin_response }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted text-center">No complaints submitted yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

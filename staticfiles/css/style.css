@@ -1,0 +1,149 @@
+/* ------------------------------------------------------
+Global Styles
+------------------------------------------------------ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  }
+
+body {
+background: #f5f7fa;
+color: #333;
+line-height: 1.6;
+}
+
+/* ------------------------------------------------------
+Navbar
+------------------------------------------------------ */
+.navbar {
+background: #2d3436;
+padding: 15px 25px;
+color: #fff;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.navbar a {
+color: #fff;
+margin-right: 20px;
+text-decoration: none;
+font-weight: 500;
+}
+
+.navbar a:hover {
+color: #00cec9;
+}
+
+/* ------------------------------------------------------
+Container / Card
+------------------------------------------------------ */
+.container {
+width: 90%;
+max-width: 1200px;
+margin: 30px auto;
+}
+
+.card {
+background: #ffffff;
+padding: 25px;
+border-radius: 12px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+margin-bottom: 20px;
+}
+
+/* ------------------------------------------------------
+Buttons
+------------------------------------------------------ */
+.btn {
+padding: 10px 18px;
+background: #0984e3;
+color: #fff;
+border: none;
+border-radius: 6px;
+text-decoration: none;
+cursor: pointer;
+transition: 0.3s;
+display: inline-block;
+}
+
+.btn:hover {
+background: #0652DD;
+}
+
+.btn-danger {
+background: #d63031;
+}
+
+.btn-danger:hover {
+background: #b71c1c;
+}
+
+/* ------------------------------------------------------
+Forms
+------------------------------------------------------ */
+form {
+width: 100%;
+margin-top: 15px;
+}
+
+form label {
+font-weight: 600;
+}
+
+form input,
+form select,
+form textarea {
+width: 100%;
+padding: 10px;
+margin-top: 7px;
+margin-bottom: 15px;
+border: 1px solid #ccc;
+border-radius: 6px;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+border-color: #0984e3;
+outline: none;
+}
+
+/* ------------------------------------------------------
+Tables
+------------------------------------------------------ */
+table {
+width: 100%;
+border-collapse: collapse;
+background: #fff;
+margin-top: 20px;
+}
+
+table th,
+table td {
+padding: 12px;
+border-bottom: 1px solid #ddd;
+text-align: left;
+}
+
+table th {
+background: #0984e3;
+color: #fff;
+}
+
+table tr:hover {
+background: #f1f1f1;
+}
+
+/* ------------------------------------------------------
+Footer
+------------------------------------------------------ */
+.footer {
+text-align: center;
+padding: 20px;
+margin-top: 30px;
+color: #777;
+}

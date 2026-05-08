@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+    }
+    .stat-card i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .stat-card h2 {
+        font-size: 48px;
+        font-weight: 700;
+        margin: 15px 0 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .stat-card p {
+        color: #666;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+    }
+    .modern-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        animation: slideInRight 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+    .modern-card:nth-child(1) { animation-delay: 0.3s; }
+    .modern-card:nth-child(2) { animation-delay: 0.4s; }
+    .action-btn {
+        width: 100%;
+        padding: 18px;
+        margin-bottom: 15px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    .action-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .task-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+        backdrop-filter: blur(10px);
+        border-left: 4px solid #667eea;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    .task-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+    }
+    body.dark-mode .stat-card,
+    body.dark-mode .modern-card,
+    body.dark-mode .task-card {
+        background: linear-gradient(135deg, rgba(26, 26, 62, 0.9) 0%, rgba(45, 27, 78, 0.8) 100%);
+        border-color: rgba(99, 102, 241, 0.3);
+    }
+    body.dark-mode .stat-card p {
+        color: #cbd5e0;
+    }
+    body.dark-mode .task-card {
+        border-left-color: #6ea8fe;
+    }
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-title i {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .leave-table {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .leave-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .leave-table tbody tr {
+        transition: all 0.3s ease;
+    }
+    .leave-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.1);
+        transform: scale(1.01);
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1><i class="fas fa-home"></i> Welcome, {{ employee.user.get_full_name }}!</h1>
+    <p class="mb-0" style="font-size: 18px; opacity: 0.95;">Employee ID: {{ employee.employee_id }} | Department: {{ employee.department|default:"Not Assigned" }}</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="stat-card">
+            <i class="fas fa-tasks"></i>
+            <h2>{{ pending_tasks }}</h2>
+            <p>Pending Tasks</p>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="stat-card">
+            <i class="fas fa-check-circle"></i>
+            <h2>{{ completed_tasks }}</h2>
+            <p>Completed Tasks</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="modern-card">
+            <h5 class="section-title"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            <a href="{% url 'employee_tasks' %}" class="btn btn-primary action-btn">
+                <i class="fas fa-tasks"></i> View All Tasks
+            </a>
+            <a href="{% url 'employee_leave_apply' %}" class="btn btn-success action-btn">
+                <i class="fas fa-calendar-plus"></i> Apply for Leave
+            </a>
+            <a href="{% url 'employee_complaint_submit' %}" class="btn btn-warning action-btn">
+                <i class="fas fa-exclamation-circle"></i> Submit Complaint
+            </a>
+            <a href="{% url 'employee_complaint_track' %}" class="btn btn-info action-btn">
+                <i class="fas fa-list"></i> Complaint Status
+            </a>
+            <a href="{% url 'employee_salary' %}" class="btn btn-secondary action-btn">
+                <i class="fas fa-money-bill-wave"></i> My Salary
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="modern-card">
+            <h5 class="section-title"><i class="fas fa-clipboard-list"></i> My Recent Tasks</h5>
+            {% if my_tasks %}
+                {% for task in my_tasks %}
+                <div class="task-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1"><strong>{{ task.title }}</strong></h6>
+                            <p class="mb-1 text-muted small">{{ task.description|truncatewords:15 }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> {{ task.created_at|date:"M d, Y" }}
+                            </small>
+                        </div>
+                        <div>
+                            {% if task.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                            {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning">In Progress</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <a href="{% url 'employee_tasks' %}" class="btn btn-outline-primary btn-sm mt-2">View All Tasks →</a>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No tasks assigned yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="modern-card">
+            <h5 class="section-title"><i class="fas fa-calendar-alt"></i> My Leave Requests</h5>
+            {% if my_leaves %}
+                <div class="table-responsive">
+                    <table class="table table-hover leave-table">
+                        <thead>
+                            <tr>
+                                <th>Leave Type</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Applied On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in my_leaves %}
+                            <tr>
+                                <td>{{ leave.get_leave_type_display }}</td>
+                                <td>{{ leave.start_date|date:"M d, Y" }}</td>
+                                <td>{{ leave.end_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if leave.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif leave.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ leave.applied_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'employee_leave_status' %}" class="btn btn-outline-primary btn-sm mt-2">View All Leaves →</a>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No leave requests found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

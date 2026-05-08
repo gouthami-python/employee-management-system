@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for {{ vacancy.title }} - TechCorp Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .apply-container {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .apply-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+        .apply-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        }
+        .job-icon {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            border: 2px solid #6c757d;
+            background: transparent;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
+        .job-details {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        .required-field::after {
+            content: ' *';
+            color: #dc3545;
+        }
+        .file-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(248, 249, 250, 0.5);
+        }
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+    </style>
+</head>
+<body>
+    {% if messages %}
+        <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="apply-container">
+            <div class="apply-header">
+                <div class="job-icon">
+                    <i class="fas fa-briefcase fa-lg"></i>
+                </div>
+                <h4 class="mb-1 fw-bold">{{ vacancy.title }}</h4>
+                <p class="mb-0 opacity-75">
+                    <i class="fas fa-building me-2"></i>{{ vacancy.department }}
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-map-marker-alt me-2"></i>{{ vacancy.location }}
+                </p>
+            </div>
+            
+            <div class="p-2">
+                <div class="job-details">
+                    <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Job Details</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Position:</strong> {{ vacancy.title }}</p>
+                            <p class="mb-1"><strong>Department:</strong> {{ vacancy.department }}</p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Location:</strong> {{ vacancy.location }}</p>
+                            <p class="mb-1"><strong>Type:</strong> {{ vacancy.employment_type }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-6 mb-1">
+                            <label for="id_applicant_name" class="form-label required-field small">Name</label>
+                            {{ form.applicant_name }}
+                        </div>
+                        <div class="col-6 mb-1">
+                            <label for="id_email" class="form-label required-field small">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-6 mb-1">
+                            <label for="id_phone" class="form-label required-field small">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-6 mb-1">
+                            <label for="id_resume" class="form-label required-field small">Resume</label>
+                            {{ form.resume }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <label for="id_cover_letter" class="form-label small">Cover Letter</label>
+                        {{ form.cover_letter }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-primary btn-submit w-100">
+                                <i class="fas fa-paper-plane me-1"></i>Submit
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'job_list' %}" class="btn btn-secondary w-100">
+                                <i class="fas fa-arrow-left me-1"></i>Back
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

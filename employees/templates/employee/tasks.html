@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}My Tasks - Employee Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tasks"></i> My Tasks</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if tasks %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>
+                                <h6>{{ task.title }}</h6>
+                                <p class="text-muted small">{{ task.description|truncatechars:50 }}</p>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}primary{% elif task.status == 'overdue' %}danger{% else %}warning{% endif %}">
+                                    {{ task.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if task.priority == 'urgent' %}danger{% elif task.priority == 'high' %}warning{% elif task.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </td>
+                            <td>{{ task.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if task.status != 'completed' %}
+                                <form method="post" action="{% url 'employee_task_update' task.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Update Status</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted text-center">No tasks assigned yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

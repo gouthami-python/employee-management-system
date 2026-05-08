@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Complaint - Employee Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-exclamation-triangle"></i> Submit Complaint</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                {{ form.subject }}
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                {{ form.description }}
+            </div>
+            <div class="mb-3 form-check">
+                {{ form.is_anonymous }}
+                <label class="form-check-label" for="is_anonymous">
+                    Submit anonymously
+                </label>
+            </div>
+            <button type="submit" class="btn btn-warning">Submit Complaint</button>
+            <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

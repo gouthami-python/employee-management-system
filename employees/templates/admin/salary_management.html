@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Salary Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Salary Management</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Salary</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.employee_id }}</td>
+                        <td>{{ employee.user.get_full_name }}</td>
+                        <td>{{ employee.department|default:"N/A" }}</td>
+                        <td>₹{{ employee.salary|floatformat:2 }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ employee.id }}">Edit</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% for employee in employees %}
+<div class="modal fade" id="editModal{{ employee.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'admin_salary_management' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Salary - {{ employee.user.get_full_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="employee_id" value="{{ employee.id }}">
+                    <div class="mb-3">
+                        <label>Current Salary</label>
+                        <input type="text" class="form-control" value="₹{{ employee.salary }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label>New Salary</label>
+                        <input type="number" name="salary" class="form-control" value="{{ employee.salary }}" step="0.01" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="update_salary" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

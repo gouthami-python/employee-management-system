@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}My Payslips{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-file-invoice"></i> My Payslips</h2>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Month/Year</th>
+                        <th>Gross Salary</th>
+                        <th>Deductions</th>
+                        <th>Net Salary</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slip in payslips %}
+                    <tr>
+                        <td>{{ slip.month_name }} {{ slip.year }}</td>
+                        <td>?{{ slip.gross_salary }}</td>
+                        <td>?{{ slip.total_deductions }}</td>
+                        <td><strong>?{{ slip.net_salary }}</strong></td>
+                        <td>
+                            {% if slip.status == 'paid' %}
+                            <span class="badge bg-success">{{ slip.get_status_display }}</span>
+                            {% else %}
+                            <span class="badge bg-warning">{{ slip.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center">No payslips available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

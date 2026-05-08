@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}My Goals - Employee{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-bullseye"></i> My Performance Goals</h2>
+</div>
+
+{% if goals %}
+    <div class="row">
+        {% for goal in goals %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">{{ goal.title }}</h6>
+                    <span class="badge bg-{% if goal.priority == 'critical' %}danger{% elif goal.priority == 'high' %}warning{% elif goal.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                        {{ goal.get_priority_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">{{ goal.description }}</p>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Progress</small>
+                            <small>{{ goal.progress_percentage|floatformat:1 }}%</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ goal.progress_percentage }}%"
+                                 aria-valuenow="{{ goal.progress_percentage }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ goal.current_value }}/{{ goal.target_value }} {{ goal.unit }}</small>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted">Status</small><br>
+                            <span class="badge bg-{% if goal.status == 'completed' %}success{% elif goal.status == 'in_progress' %}primary{% elif goal.status == 'overdue' %}danger{% else %}secondary{% endif %}">
+                                {{ goal.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Due Date</small><br>
+                            <strong>{{ goal.due_date }}</strong>
+                            {% if goal.is_overdue %}
+                                <br><small class="text-danger">Overdue</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'employee_goal_update' goal.pk %}" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-edit"></i> Update Progress
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
+            <h5>No Goals Assigned</h5>
+            <p class="text-muted">Your manager hasn't assigned any performance goals yet.</p>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

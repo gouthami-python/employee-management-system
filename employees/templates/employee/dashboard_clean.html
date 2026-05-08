@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-tachometer-alt"></i> Employee Dashboard</h2>
+            <p class="text-muted">Welcome back, {{ employee.user.get_full_name|default:employee.user.username }}!</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ pending_tasks }}</h4>
+                            <p class="mb-0">Pending Tasks</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-tasks fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ completed_tasks }}</h4>
+                            <p class="mb-0">Completed Tasks</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ my_leaves.count }}</h4>
+                            <p class="mb-0">Leave Requests</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ announcements.count }}</h4>
+                            <p class="mb-0">New Announcements</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bullhorn fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- My Tasks -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-tasks"></i> My Recent Tasks</h5>
+                    <a href="{% url 'employee_tasks' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if my_tasks %}
+                        {% for task in my_tasks %}
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 border-bottom">
+                            <div>
+                                <strong>{{ task.title }}</strong><br>
+                                <small class="text-muted">Due: {{ task.due_date|date:"M d, Y" }}</small>
+                            </div>
+                            <span class="badge badge-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No tasks assigned yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Announcements -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bullhorn"></i> Recent Announcements</h5>
+                </div>
+                <div class="card-body">
+                    {% if announcements %}
+                        {% for announcement in announcements %}
+                        <div class="mb-3 p-2 border-bottom">
+                            <strong>{{ announcement.title }}</strong><br>
+                            <p class="mb-1">{{ announcement.content|truncatewords:15 }}</p>
+                            <small class="text-muted">{{ announcement.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent announcements.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Status -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5><i class="fas fa-calendar-alt"></i> My Leave Requests</h5>
+                    <a href="{% url 'employee_leave_apply' %}" class="btn btn-sm btn-success">Apply for Leave</a>
+                </div>
+                <div class="card-body">
+                    {% if my_leaves %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Leave Type</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Days</th>
+                                        <th>Status</th>
+                                        <th>Applied On</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for leave in my_leaves %}
+                                    <tr>
+                                        <td>{{ leave.get_leave_type_display }}</td>
+                                        <td>{{ leave.start_date|date:"M d, Y" }}</td>
+                                        <td>{{ leave.end_date|date:"M d, Y" }}</td>
+                                        <td>{{ leave.total_days }}</td>
+                                        <td>
+                                            <span class="badge badge-{% if leave.status == 'approved' %}success{% elif leave.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                                {{ leave.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ leave.applied_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No leave requests found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'employee_tasks' %}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-tasks"></i> View My Tasks
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'employee_leave_apply' %}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-calendar-plus"></i> Apply for Leave
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'employee_complaint_submit' %}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-exclamation-circle"></i> Submit Complaint
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'employee_profile' %}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-user"></i> View Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

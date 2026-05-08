@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Performance Reviews - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-star"></i> Performance Reviews Management</h2>
+    <div>
+        <a href="{% url 'performance_review_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Review
+        </a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+{% if reviews %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">All Performance Reviews ({{ reviews.count }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Reviewer</th>
+                        <th>Review Type</th>
+                        <th>Period</th>
+                        <th>Overall Rating</th>
+                        <th>Goals Achievement</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td>
+                            <strong>{{ review.employee.user.get_full_name }}</strong><br>
+                            <small class="text-muted">{{ review.employee.employee_id }}</small>
+                        </td>
+                        <td>{{ review.reviewer.user.get_full_name }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ review.get_review_type_display }}</span>
+                        </td>
+                        <td>
+                            {{ review.review_period_start|date:"M d, Y" }}<br>
+                            <small class="text-muted">to {{ review.review_period_end|date:"M d, Y" }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if review.overall_rating >= 4.0 %}success{% elif review.overall_rating >= 3.0 %}primary{% elif review.overall_rating >= 2.0 %}warning{% else %}danger{% endif %}">
+                                {{ review.overall_rating }}/5
+                            </span>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-{% if review.goals_achievement >= 80 %}success{% elif review.goals_achievement >= 60 %}primary{% elif review.goals_achievement >= 40 %}warning{% else %}danger{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ review.goals_achievement }}%">
+                                    {{ review.goals_achievement }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if review.status == 'approved' %}success{% elif review.status == 'submitted' %}primary{% elif review.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                                {{ review.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ review.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'performance_review_edit' review.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#reviewModal{{ review.pk }}" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Review Detail Modals -->
+{% for review in reviews %}
+<div class="modal fade" id="reviewModal{{ review.pk }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Performance Review Details - {{ review.employee.user.get_full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Review Information</h6>
+                        <p><strong>Employee:</strong> {{ review.employee.user.get_full_name }}</p>
+                        <p><strong>Reviewer:</strong> {{ review.reviewer.user.get_full_name }}</p>
+                        <p><strong>Type:</strong> {{ review.get_review_type_display }}</p>
+                        <p><strong>Period:</strong> {{ review.review_period_start }} to {{ review.review_period_end }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{% if review.status == 'approved' %}success{% elif review.status == 'submitted' %}primary{% elif review.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                                {{ review.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Performance Metrics</h6>
+                        <p><strong>Overall Rating:</strong> {{ review.overall_rating }}/5</p>
+                        <p><strong>Goals Achievement:</strong> {{ review.goals_achievement }}%</p>
+                        <p><strong>Attendance Score:</strong> {{ review.attendance_score }}/5</p>
+                        <p><strong>Quality of Work:</strong> {{ review.quality_of_work }}/5</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6>Achievements</h6>
+                        <p>{{ review.achievements|linebreaks }}</p>
+                        
+                        <h6>Areas of Improvement</h6>
+                        <p>{{ review.areas_of_improvement|linebreaks }}</p>
+                        
+                        <h6>Development Plan</h6>
+                        <p>{{ review.development_plan|linebreaks }}</p>
+                        
+                        {% if review.manager_comments %}
+                        <h6>Manager Comments</h6>
+                        <p>{{ review.manager_comments|linebreaks }}</p>
+                        {% endif %}
+                        
+                        {% if review.employee_comments %}
+                        <h6>Employee Comments</h6>
+                        <p>{{ review.employee_comments|linebreaks }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{% url 'performance_review_edit' review.pk %}" class="btn btn-primary">Edit Review</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="card">
+    <div class="card-body text-center">
+        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+        <h5>No Performance Reviews Found</h5>
+        <p class="text-muted">Start by creating your first performance review.</p>
+        <a href="{% url 'performance_review_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add First Review
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

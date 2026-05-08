@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}My Performance Reviews{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-star"></i> My Performance Reviews</h2>
+    <a href="{% url 'employee_performance_dashboard' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Performance
+    </a>
+</div>
+
+{% if reviews %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">All My Reviews ({{ reviews.count }})</h5>
+    </div>
+    <div class="card-body">
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <h6 class="mb-0">{{ review.get_review_type_display }} - {{ review.review_period_start }} to {{ review.review_period_end }}</h6>
+                    <span class="badge bg-{% if review.status == 'approved' %}success{% elif review.status == 'submitted' %}primary{% elif review.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                        {{ review.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Performance Metrics</h6>
+                        <p><strong>Overall Rating:</strong> {{ review.overall_rating }}/5</p>
+                        <p><strong>Goals Achievement:</strong> {{ review.goals_achievement }}%</p>
+                        <p><strong>Attendance Score:</strong> {{ review.attendance_score }}/5</p>
+                        <p><strong>Quality of Work:</strong> {{ review.quality_of_work }}/5</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Review Details</h6>
+                        <p><strong>Reviewer:</strong> {{ review.reviewer.user.get_full_name }}</p>
+                        <p><strong>Review Date:</strong> {{ review.created_at|date:"M d, Y" }}</p>
+                        {% if review.submitted_at %}
+                        <p><strong>Submitted:</strong> {{ review.submitted_at|date:"M d, Y" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6>Achievements</h6>
+                        <p>{{ review.achievements|linebreaks }}</p>
+                        
+                        <h6>Areas for Improvement</h6>
+                        <p>{{ review.areas_of_improvement|linebreaks }}</p>
+                        
+                        <h6>Development Plan</h6>
+                        <p>{{ review.development_plan|linebreaks }}</p>
+                        
+                        {% if review.manager_comments %}
+                        <h6>Manager Comments</h6>
+                        <p>{{ review.manager_comments|linebreaks }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center">
+        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+        <h5>No Performance Reviews Yet</h5>
+        <p class="text-muted">Your performance reviews will appear here once they are created by your manager.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

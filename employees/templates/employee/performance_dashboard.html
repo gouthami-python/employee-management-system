@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}My Performance Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-line"></i> My Performance Dashboard</h2>
+    <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<!-- Performance Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3>{{ avg_rating }}</h3>
+                <p class="mb-0">Average Rating</p>
+                <small>Out of 5.0</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3>{{ goal_completion_rate }}%</h3>
+                <p class="mb-0">Goal Completion</p>
+                <small>{{ goals_completed }}/{{ total_goals }} goals</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3>{{ my_reviews.count }}</h3>
+                <p class="mb-0">Performance Reviews</p>
+                <small>Total received</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h3>{{ my_kpis.count }}</h3>
+                <p class="mb-0">Active KPIs</p>
+                <small>Currently tracking</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Sections -->
+<div class="row">
+    <!-- Recent Performance Reviews -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Recent Performance Reviews</h5>
+                <a href="{% url 'employee_my_reviews' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if my_reviews %}
+                    {% for review in my_reviews %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ review.get_review_type_display }}</h6>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="text-muted small mb-1">
+                            Reviewer: {{ review.reviewer.user.get_full_name }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-{% if review.overall_rating >= 4.0 %}success{% elif review.overall_rating >= 3.0 %}primary{% elif review.overall_rating >= 2.0 %}warning{% else %}danger{% endif %}">
+                                {{ review.overall_rating }}/5
+                            </span>
+                            <div class="progress" style="width: 100px; height: 15px;">
+                                <div class="progress-bar bg-{% if review.goals_achievement >= 80 %}success{% elif review.goals_achievement >= 60 %}primary{% elif review.goals_achievement >= 40 %}warning{% else %}danger{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ review.goals_achievement }}%">
+                                </div>
+                            </div>
+                            <small>{{ review.goals_achievement }}% goals</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No performance reviews yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Goals -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-bullseye"></i> Performance Goals</h5>
+                <a href="{% url 'employee_goals' %}" class="btn btn-sm btn-outline-success">View All</a>
+            </div>
+            <div class="card-body">
+                {% if my_goals %}
+                    {% for goal in my_goals %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ goal.title|truncatechars:30 }}</h6>
+                            <small class="text-muted">Due: {{ goal.due_date|date:"M d" }}</small>
+                        </div>
+                        <div class="progress mb-1" style="height: 15px;">
+                            <div class="progress-bar bg-{% if goal.progress_percentage >= 80 %}success{% elif goal.progress_percentage >= 60 %}primary{% elif goal.progress_percentage >= 40 %}warning{% else %}danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ goal.progress_percentage }}%">
+                                {{ goal.progress_percentage|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-{% if goal.status == 'completed' %}success{% elif goal.status == 'in_progress' %}primary{% elif goal.status == 'overdue' %}danger{% else %}secondary{% endif %}">
+                                {{ goal.get_status_display }}
+                            </span>
+                            <small class="text-muted">{{ goal.current_value }}/{{ goal.target_value }} {{ goal.unit }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No performance goals assigned yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- My KPIs -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> My KPIs</h5>
+                <a href="{% url 'employee_my_kpis' %}" class="btn btn-sm btn-outline-info">View All</a>
+            </div>
+            <div class="card-body">
+                {% if my_kpis %}
+                    {% for emp_kpi in my_kpis %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ emp_kpi.kpi.name|truncatechars:25 }}</h6>
+                            <small class="text-muted">{{ emp_kpi.period_end|date:"M d" }}</small>
+                        </div>
+                        <div class="progress mb-1" style="height: 15px;">
+                            <div class="progress-bar bg-{% if emp_kpi.achievement_percentage >= 80 %}success{% elif emp_kpi.achievement_percentage >= 60 %}primary{% elif emp_kpi.achievement_percentage >= 40 %}warning{% else %}danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ emp_kpi.achievement_percentage }}%">
+                                {{ emp_kpi.achievement_percentage|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">{{ emp_kpi.current_value }}/{{ emp_kpi.target_value }} {{ emp_kpi.kpi.unit }}</small>
+                            <a href="{% url 'employee_kpi_update' emp_kpi.pk %}" class="btn btn-xs btn-outline-primary">Update</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No KPIs assigned yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Feedback -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-comments"></i> Recent Feedback</h5>
+                <a href="{% url 'employee_feedback_received' %}" class="btn btn-sm btn-outline-warning">View All</a>
+            </div>
+            <div class="card-body">
+                {% if my_feedback %}
+                    {% for feedback in my_feedback %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ feedback.get_feedback_type_display }}</h6>
+                            <small class="text-muted">{{ feedback.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="text-muted small mb-1">
+                            From: {% if not feedback.is_anonymous %}{{ feedback.feedback_by.user.get_full_name }}{% else %}Anonymous{% endif %}
+                        </p>
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-{% if feedback.overall_rating >= 4.0 %}success{% elif feedback.overall_rating >= 3.0 %}primary{% elif feedback.overall_rating >= 2.0 %}warning{% else %}danger{% endif %}">
+                                {{ feedback.overall_rating|floatformat:1 }}/5
+                            </span>
+                            <small class="text-muted">{{ feedback.strengths|truncatechars:30 }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No feedback received yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Performance Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'employee_goals' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-bullseye"></i> Update Goals
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'employee_my_kpis' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-chart-bar"></i> Update KPIs
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'employee_feedback_give' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-comment"></i> Give Feedback
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'employee_my_reviews' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-star"></i> View Reviews
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

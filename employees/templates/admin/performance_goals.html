@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Performance Goals - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-bullseye"></i> Performance Goals</h2>
+    <a href="{% url 'performance_goal_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Goal
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if goals %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Goal</th>
+                            <th>Progress</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for goal in goals %}
+                        <tr>
+                            <td>{{ goal.employee }}</td>
+                            <td>
+                                <strong>{{ goal.title }}</strong><br>
+                                <small class="text-muted">{{ goal.description|truncatechars:50 }}</small>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ goal.progress_percentage }}%"
+                                         aria-valuenow="{{ goal.progress_percentage }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        {{ goal.progress_percentage|floatformat:1 }}%
+                                    </div>
+                                </div>
+                                <small>{{ goal.current_value }}/{{ goal.target_value }} {{ goal.unit }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if goal.priority == 'critical' %}danger{% elif goal.priority == 'high' %}warning{% elif goal.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                    {{ goal.get_priority_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if goal.status == 'completed' %}success{% elif goal.status == 'in_progress' %}primary{% elif goal.status == 'overdue' %}danger{% else %}secondary{% endif %}">
+                                    {{ goal.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ goal.due_date }}
+                                {% if goal.is_overdue %}
+                                    <br><small class="text-danger">Overdue</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ goal.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
+                <h5>No Performance Goals</h5>
+                <p class="text-muted">Start by creating performance goals for employees.</p>
+                <a href="{% url 'performance_goal_add' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add First Goal
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

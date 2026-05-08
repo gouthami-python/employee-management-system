@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if review %}Edit{% else %}Add{% endif %} Performance Review - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-star"></i> {% if review %}Edit{% else %}Add{% endif %} Performance Review</h2>
+    <a href="{% url 'performance_review_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Reviews
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Performance Review Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.employee.id_for_label }}" class="form-label">Employee *</label>
+                                {{ form.employee }}
+                                {% if form.employee.errors %}
+                                    <div class="text-danger small">{{ form.employee.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.review_type.id_for_label }}" class="form-label">Review Type *</label>
+                                {{ form.review_type }}
+                                {% if form.review_type.errors %}
+                                    <div class="text-danger small">{{ form.review_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.review_period_start.id_for_label }}" class="form-label">Review Period Start *</label>
+                                {{ form.review_period_start }}
+                                {% if form.review_period_start.errors %}
+                                    <div class="text-danger small">{{ form.review_period_start.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.review_period_end.id_for_label }}" class="form-label">Review Period End *</label>
+                                {{ form.review_period_end }}
+                                {% if form.review_period_end.errors %}
+                                    <div class="text-danger small">{{ form.review_period_end.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <h6>Performance Metrics</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.overall_rating.id_for_label }}" class="form-label">Overall Rating (1-5) *</label>
+                                {{ form.overall_rating }}
+                                <div class="form-text">Rate the employee's overall performance</div>
+                                {% if form.overall_rating.errors %}
+                                    <div class="text-danger small">{{ form.overall_rating.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.goals_achievement.id_for_label }}" class="form-label">Goals Achievement (%) *</label>
+                                {{ form.goals_achievement }}
+                                <div class="form-text">Percentage of goals achieved during review period</div>
+                                {% if form.goals_achievement.errors %}
+                                    <div class="text-danger small">{{ form.goals_achievement.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.attendance_score.id_for_label }}" class="form-label">Attendance Score (1-5) *</label>
+                                {{ form.attendance_score }}
+                                <div class="form-text">Rate attendance and punctuality</div>
+                                {% if form.attendance_score.errors %}
+                                    <div class="text-danger small">{{ form.attendance_score.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.quality_of_work.id_for_label }}" class="form-label">Quality of Work (1-5) *</label>
+                                {{ form.quality_of_work }}
+                                <div class="form-text">Rate the quality and accuracy of work</div>
+                                {% if form.quality_of_work.errors %}
+                                    <div class="text-danger small">{{ form.quality_of_work.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <h6>Review Comments</h6>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.achievements.id_for_label }}" class="form-label">Key Achievements *</label>
+                        {{ form.achievements }}
+                        <div class="form-text">List the employee's key achievements during the review period</div>
+                        {% if form.achievements.errors %}
+                            <div class="text-danger small">{{ form.achievements.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.areas_of_improvement.id_for_label }}" class="form-label">Areas of Improvement *</label>
+                        {{ form.areas_of_improvement }}
+                        <div class="form-text">Identify areas where the employee can improve</div>
+                        {% if form.areas_of_improvement.errors %}
+                            <div class="text-danger small">{{ form.areas_of_improvement.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.development_plan.id_for_label }}" class="form-label">Development Plan *</label>
+                        {{ form.development_plan }}
+                        <div class="form-text">Outline the development plan for the next review period</div>
+                        {% if form.development_plan.errors %}
+                            <div class="text-danger small">{{ form.development_plan.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.manager_comments.id_for_label }}" class="form-label">Manager Comments</label>
+                        {{ form.manager_comments }}
+                        <div class="form-text">Additional comments from the manager</div>
+                        {% if form.manager_comments.errors %}
+                            <div class="text-danger small">{{ form.manager_comments.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'performance_review_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {% if review %}Update{% else %}Create{% endif %} Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Performance Review Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <h6>Rating Scale:</h6>
+                <ul class="list-unstyled">
+                    <li><span class="badge bg-success">5</span> Excellent - Exceeds expectations</li>
+                    <li><span class="badge bg-primary">4</span> Good - Meets expectations well</li>
+                    <li><span class="badge bg-warning">3</span> Average - Meets basic expectations</li>
+                    <li><span class="badge bg-orange">2</span> Below Average - Needs improvement</li>
+                    <li><span class="badge bg-danger">1</span> Poor - Significant improvement needed</li>
+                </ul>
+                
+                <hr>
+                
+                <h6>Review Types:</h6>
+                <ul class="small">
+                    <li><strong>Annual:</strong> Comprehensive yearly review</li>
+                    <li><strong>Quarterly:</strong> Regular quarterly assessment</li>
+                    <li><strong>Monthly:</strong> Monthly check-in</li>
+                    <li><strong>Probation:</strong> Probationary period review</li>
+                </ul>
+                
+                <hr>
+                
+                <h6>Tips for Effective Reviews:</h6>
+                <ul class="small">
+                    <li>Be specific and provide examples</li>
+                    <li>Focus on behaviors and outcomes</li>
+                    <li>Set clear, achievable goals</li>
+                    <li>Provide constructive feedback</li>
+                    <li>Encourage employee input</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

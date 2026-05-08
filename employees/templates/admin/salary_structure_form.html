@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Salary Structure{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-calculator"></i> Create Salary Structure - {{ employee.user.get_full_name }}</h2>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Basic Pay</label>
+                    <input type="number" name="basic_pay" class="form-control" step="0.01" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">HRA</label>
+                    <input type="number" name="hra" class="form-control" step="0.01" value="0">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Transport Allowance</label>
+                    <input type="number" name="transport_allowance" class="form-control" step="0.01" value="0">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Medical Allowance</label>
+                    <input type="number" name="medical_allowance" class="form-control" step="0.01" value="0">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Other Allowances</label>
+                    <input type="number" name="other_allowances" class="form-control" step="0.01" value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Create Structure</button>
+            <a href="{% url 'admin_salary_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

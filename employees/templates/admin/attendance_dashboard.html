@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-clock me-2"></i>Attendance Management</h2>
+            
+            <!-- Today's Summary -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card bg-success text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-check fa-2x mb-2"></i>
+                            <h3>{{ present_today }}</h3>
+                            <p>Present Today</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-warning text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-clock fa-2x mb-2"></i>
+                            <h3>{{ late_today }}</h3>
+                            <p>Late Today</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-danger text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-times fa-2x mb-2"></i>
+                            <h3>{{ absent_today }}</h3>
+                            <p>Absent Today</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-info text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <h3>{{ total_employees }}</h3>
+                            <p>Total Employees</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <a href="{% url 'admin_attendance_records' %}" class="btn btn-primary btn-block mb-2">
+                                        <i class="fas fa-list me-2"></i>View All Records
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'admin_correction_requests' %}" class="btn btn-warning btn-block mb-2">
+                                        <i class="fas fa-edit me-2"></i>Correction Requests
+                                        {% if pending_corrections %}
+                                            <span class="badge bg-danger">{{ pending_corrections|length }}</span>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'admin_work_schedules' %}" class="btn btn-info btn-block mb-2">
+                                        <i class="fas fa-calendar-alt me-2"></i>Work Schedules
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'admin_schedule_add' %}" class="btn btn-success btn-block mb-2">
+                                        <i class="fas fa-plus me-2"></i>Add Schedule
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Attendance Records -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Attendance Records</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Total Hours</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_records %}
+                                <tr>
+                                    <td>{{ record.employee.user.get_full_name }}</td>
+                                    <td>{{ record.date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if record.check_in_time %}
+                                            {{ record.check_in_time|time:"H:i" }}
+                                            {% if record.is_late %}
+                                                <small class="text-warning">({{ record.late_minutes }}m late)</small>
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ record.check_out_time|time:"H:i"|default:"-" }}</td>
+                                    <td>{{ record.total_hours|floatformat:2|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if record.status == 'present' %}success{% elif record.status == 'late' %}warning{% else %}danger{% endif %}">
+                                            {{ record.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No attendance records found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Correction Requests -->
+            {% if pending_corrections %}
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Pending Correction Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Current Times</th>
+                                    <th>Requested Times</th>
+                                    <th>Reason</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for correction in pending_corrections %}
+                                <tr>
+                                    <td>{{ correction.employee.user.get_full_name }}</td>
+                                    <td>{{ correction.attendance_record.date|date:"M d, Y" }}</td>
+                                    <td>
+                                        In: {{ correction.attendance_record.check_in_time|time:"H:i"|default:"-" }}<br>
+                                        Out: {{ correction.attendance_record.check_out_time|time:"H:i"|default:"-" }}
+                                    </td>
+                                    <td>
+                                        In: {{ correction.requested_check_in|time:"H:i"|default:"-" }}<br>
+                                        Out: {{ correction.requested_check_out|time:"H:i"|default:"-" }}
+                                    </td>
+                                    <td>{{ correction.reason|truncatechars:50 }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'admin_correction_approve' correction.pk %}" 
+                                               class="btn btn-success btn-sm"
+                                               onclick="return confirm('Approve this correction request?')">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="{% url 'admin_correction_reject' correction.pk %}" 
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Reject this correction request?')">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

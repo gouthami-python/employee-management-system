@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Attendance Correction{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Request Attendance Correction</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Attendance Details:</strong><br>
+                        Date: {{ attendance.date }}<br>
+                        Check-in: {{ attendance.check_in|time:"h:i A" }}<br>
+                        Check-out: {{ attendance.check_out|time:"h:i A"|default:"Not checked out" }}
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Reason for Correction</label>
+                            {{ form.reason }}
+                        </div>
+                        <button type="submit" class="btn btn-warning">Submit Request</button>
+                        <a href="{% url 'employee_attendance' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

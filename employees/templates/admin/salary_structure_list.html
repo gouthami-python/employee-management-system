@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Salary Structures{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title">
+                        <i class="fas fa-cog me-2"></i>Salary Structures
+                    </h4>
+                    <div>
+                        <a href="{% url 'admin_salary_structure_add' %}" class="btn btn-success me-2">
+                            <i class="fas fa-plus me-2"></i>Add Structure
+                        </a>
+                        <a href="{% url 'admin_salary_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Salary List
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Basic Pay</th>
+                                    <th>HRA</th>
+                                    <th>Allowances</th>
+                                    <th>Gross Salary</th>
+                                    <th>PF Rate</th>
+                                    <th>ESI Rate</th>
+                                    <th>Effective From</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for structure in structures %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ structure.employee.user.get_full_name }}</strong><br>
+                                        <small class="text-muted">{{ structure.employee.employee_id }}</small>
+                                    </td>
+                                    <td>₹{{ structure.basic_pay|floatformat:2 }}</td>
+                                    <td>₹{{ structure.hra|floatformat:2 }}</td>
+                                    <td>
+                                        <small>
+                                            Transport: ₹{{ structure.transport_allowance|floatformat:2 }}<br>
+                                            Medical: ₹{{ structure.medical_allowance|floatformat:2 }}<br>
+                                            Other: ₹{{ structure.other_allowances|floatformat:2 }}
+                                        </small>
+                                    </td>
+                                    <td><strong>₹{{ structure.gross_salary|floatformat:2 }}</strong></td>
+                                    <td>{{ structure.pf_rate }}%</td>
+                                    <td>{{ structure.esi_rate }}%</td>
+                                    <td>{{ structure.effective_from|date:"M d, Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">No salary structures found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

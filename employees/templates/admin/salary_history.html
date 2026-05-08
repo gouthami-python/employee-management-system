@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Salary History - {{ employee.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-history"></i> Salary History - {{ employee.user.get_full_name }}</h2>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+        <p><strong>Current Salary:</strong> ?{{ employee.salary|floatformat:2 }}</p>
+        <hr>
+        <h5>Change History</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Old Salary</th>
+                        <th>New Salary</th>
+                        <th>Change</th>
+                        <th>Type</th>
+                        <th>Reason</th>
+                        <th>Changed By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in history %}
+                    <tr>
+                        <td>{{ h.changed_at|date:"M d, Y H:i" }}</td>
+                        <td>?{{ h.old_salary|floatformat:2 }}</td>
+                        <td>?{{ h.new_salary|floatformat:2 }}</td>
+                        <td>
+                            {% if h.new_salary > h.old_salary %}
+                            <span class="badge bg-success">+?{{ h.new_salary|add:"-"|add:h.old_salary|floatformat:2 }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">-?{{ h.old_salary|add:"-"|add:h.new_salary|floatformat:2 }}</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-info">{{ h.get_change_type_display }}</span></td>
+                        <td>{{ h.reason|default:"N/A" }}</td>
+                        <td>{{ h.changed_by.get_full_name|default:h.changed_by.username }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center">No salary history found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'admin_salary_management' %}" class="btn btn-secondary mt-3">Back to Salary Management</a>
+    </div>
+</div>
+{% endblock %}

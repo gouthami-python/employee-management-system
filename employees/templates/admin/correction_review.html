@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Correction Request{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-clipboard-check"></i> Review Correction Request</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Employee:</strong> {{ correction.employee.user.get_full_name }}<br>
+                            <strong>Employee ID:</strong> {{ correction.employee.employee_id }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date:</strong> {{ correction.attendance.date }}<br>
+                            <strong>Requested At:</strong> {{ correction.requested_at|date:"M d, Y h:i A" }}
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">Attendance Details</div>
+                        <div class="card-body">
+                            <strong>Check-in:</strong> {{ correction.attendance.check_in|time:"h:i A" }}<br>
+                            <strong>Check-out:</strong> {{ correction.attendance.check_out|time:"h:i A"|default:"Not checked out" }}<br>
+                            <strong>Status:</strong> <span class="badge bg-info">{{ correction.attendance.get_status_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">Employee's Reason</div>
+                        <div class="card-body">
+                            {{ correction.reason }}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Admin Remarks</label>
+                            <textarea name="remarks" class="form-control" rows="3" placeholder="Optional remarks..."></textarea>
+                        </div>
+                        <button type="submit" name="action" value="approve" class="btn btn-success approve-btn">
+                            <i class="fas fa-check"></i> Approve & Remove Checkout
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-warning reject-btn">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <a href="{% url 'admin_correction_list' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

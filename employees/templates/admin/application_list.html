@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Applications - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-file-alt"></i> Job Applications{% if vacancy %} - {{ vacancy.title }}{% endif %}</h2>
+    <a href="{% url 'vacancy_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Vacancies</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if applications %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Position</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td>{{ application.applicant_name }}</td>
+                            <td>{{ application.vacancy.title }}</td>
+                            <td>{{ application.email }}</td>
+                            <td>{{ application.phone }}</td>
+                            <td>
+                                <span class="badge bg-{% if application.status == 'shortlisted' %}success{% elif application.status == 'rejected' %}danger{% elif application.status == 'under_review' %}warning{% else %}info{% endif %}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ application.applied_date|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'application_update' application.pk %}" class="btn btn-sm btn-outline-primary">Review</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted text-center">No applications received yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

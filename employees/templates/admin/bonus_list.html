@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Bonus Management{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-gift"></i> Bonus Management</h2>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Reason</th>
+                        <th>Given By</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bonus in bonuses %}
+                    <tr>
+                        <td>{{ bonus.employee.user.get_full_name }}</td>
+                        <td>?{{ bonus.amount|floatformat:2 }}</td>
+                        <td><span class="badge bg-success">{{ bonus.get_bonus_type_display }}</span></td>
+                        <td>{{ bonus.reason }}</td>
+                        <td>{{ bonus.given_by.get_full_name|default:bonus.given_by.username }}</td>
+                        <td>{{ bonus.given_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">No bonuses found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

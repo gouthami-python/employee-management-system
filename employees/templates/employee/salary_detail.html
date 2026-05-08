@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Salary Details - {{ salary_record.month_name }} {{ salary_record.year }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>
+                        Salary Details - {{ salary_record.month_name }} {{ salary_record.year }}
+                    </h4>
+                    <div>
+                        <a href="{% url 'salary_slip_pdf' salary_record.pk %}" class="btn btn-success" target="_blank">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </a>
+                        <a href="{% url 'employee_salary_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Employee Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Employee Information</h6>
+                            <p><strong>Name:</strong> {{ employee.user.get_full_name }}</p>
+                            <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+                            <p><strong>Department:</strong> {{ employee.department|default:"N/A" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Salary Information</h6>
+                            <p><strong>Month/Year:</strong> {{ salary_record.month_name }} {{ salary_record.year }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge bg-{% if salary_record.status == 'paid' %}success{% elif salary_record.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ salary_record.get_status_display }}
+                                </span>
+                            </p>
+                            <p><strong>Generated On:</strong> {{ salary_record.generated_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Salary Breakdown -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Earnings</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td>Basic Pay</td>
+                                            <td class="text-end">₹{{ salary_record.basic_pay|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>HRA</td>
+                                            <td class="text-end">₹{{ salary_record.hra|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Transport Allowance</td>
+                                            <td class="text-end">₹{{ salary_record.transport_allowance|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Medical Allowance</td>
+                                            <td class="text-end">₹{{ salary_record.medical_allowance|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Other Allowances</td>
+                                            <td class="text-end">₹{{ salary_record.other_allowances|floatformat:2 }}</td>
+                                        </tr>
+                                        {% if salary_record.bonus > 0 %}
+                                        <tr>
+                                            <td>Bonus</td>
+                                            <td class="text-end">₹{{ salary_record.bonus|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if salary_record.overtime > 0 %}
+                                        <tr>
+                                            <td>Overtime</td>
+                                            <td class="text-end">₹{{ salary_record.overtime|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr class="table-success">
+                                            <td><strong>Gross Salary</strong></td>
+                                            <td class="text-end"><strong>₹{{ salary_record.gross_salary|floatformat:2 }}</strong></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card border-danger">
+                                <div class="card-header bg-danger text-white">
+                                    <h6 class="mb-0"><i class="fas fa-minus-circle me-2"></i>Deductions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td>PF (Employee)</td>
+                                            <td class="text-end">₹{{ salary_record.pf_employee|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ESI (Employee)</td>
+                                            <td class="text-end">₹{{ salary_record.esi_employee|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Professional Tax</td>
+                                            <td class="text-end">₹{{ salary_record.professional_tax|floatformat:2 }}</td>
+                                        </tr>
+                                        {% if salary_record.income_tax > 0 %}
+                                        <tr>
+                                            <td>Income Tax / TDS</td>
+                                            <td class="text-end">₹{{ salary_record.income_tax|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if salary_record.other_deductions > 0 %}
+                                        <tr>
+                                            <td>Other Deductions</td>
+                                            <td class="text-end">₹{{ salary_record.other_deductions|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr class="table-danger">
+                                            <td><strong>Total Deductions</strong></td>
+                                            <td class="text-end"><strong>₹{{ salary_record.total_deductions|floatformat:2 }}</strong></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Net Salary -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-primary text-center">
+                                <h4 class="mb-0">
+                                    <i class="fas fa-wallet me-2"></i>
+                                    Net Salary: <strong>₹{{ salary_record.net_salary|floatformat:2 }}</strong>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Employer Contributions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="fas fa-building me-2"></i>Employer Contributions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>PF (Employer):</strong> ₹{{ salary_record.pf_employer|floatformat:2 }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>ESI (Employer):</strong> ₹{{ salary_record.esi_employer|floatformat:2 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
